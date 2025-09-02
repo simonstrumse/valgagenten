@@ -3,6 +3,39 @@ import { ragSearch } from "@/lib/rag";
 import { buildPartyAgentMessages } from "@/lib/prompts";
 import { openai } from "@/lib/openai";
 
+const topicSuggestions: Record<string, string[]> = {
+  skatt: [
+    "Hva mener dere om formuesskatten?",
+    "Hvordan påvirkes vanlige lønnsmottakere?",
+    "Skatt på bedrifter vs. investeringer?",
+  ],
+  klima: [
+    "Karbonavgift eller andre virkemidler?",
+    "Hva med omstilling i industrien?",
+    "Internasjonalt samarbeid vs. nasjonale kutt?",
+  ],
+  skole: [
+    "Flere lærere eller mer testing?",
+    "Spesialundervisning og ressurser?",
+    "Lekser og vurderingsformer?",
+  ],
+  helse: [
+    "Ventetider og fastlegeordningen?",
+    "Psykisk helse prioriteringer?",
+    "Forebygging vs. behandling?",
+  ],
+  innvandring: [
+    "Asylkriterier og integrering?",
+    "Familiegjenforening?",
+    "Arbeidsinnvandring vs. humanitære hensyn?",
+  ],
+  miljø: [
+    "Vern av natur og arealbruk?",
+    "Transport og arealplanlegging?",
+    "Kraftutbygging vs. naturhensyn?",
+  ],
+};
+
 export async function POST(req: NextRequest) {
   const { topic, party } = await req.json();
   if (!topic || !party) return NextResponse.json({ error: "Missing topic/party" }, { status: 400 });
@@ -16,5 +49,10 @@ export async function POST(req: NextRequest) {
     temperature: 0.5,
   });
   const text = ai.choices?.[0]?.message?.content ?? "";
-  return NextResponse.json({ text, citations });
+  const suggestions = topicSuggestions[topic as string] || [
+    "Kan du presisere hovedmålet i politikken?",
+    "Hvilke tiltak prioriteres først?",
+    "Hva er kompromisser dere er åpne for?",
+  ];
+  return NextResponse.json({ text, citations, suggestions });
 }

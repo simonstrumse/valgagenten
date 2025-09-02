@@ -22,10 +22,13 @@ SCORE: <heltall>
 BEGRUNNELSE: <maks 80 ord>`;
 
 export function buildPartyAgentMessages({ party, topic, context, userText }: { party: string; topic: string; context: string; userText?: string }): ChatCompletionMessageParam[] {
-  const sys = `${SECURITY_PROMPT}\n\n${partyAgentSystem(party, topic)}`;
+  const extra = context && context.trim().length > 0
+    ? ""
+    : "Hvis konteksten er tom: Gi en kort, forsiktig og generell oppsummering av typiske posisjoner i norsk politikk relatert til temaet, marker tydelig usikkerhet og unngå konkrete påstander eller tall. Ikke si at du mangler kontekst; lever et nyttig utgangspunkt med forbehold.";
+  const sys = `${SECURITY_PROMPT}\n\n${partyAgentSystem(party, topic)}\n\n${extra}`;
   const messages: ChatCompletionMessageParam[] = [
     { role: "system", content: sys },
-    { role: "user", content: `Kontekst (utdrag):\n${context}` },
+    { role: "user", content: `Kontekst (utdrag):\n${context || "(tom)"}` },
   ];
   if (userText) messages.push({ role: "user", content: `Brukerens siste innvendinger:\n${userText}` });
   return messages;

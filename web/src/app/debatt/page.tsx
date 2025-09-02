@@ -1,18 +1,23 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useDebateStore } from "@/store/useDebateStore";
+import { MicButton } from "@/components/MicButton";
+import { TTSButton } from "@/components/TTSButton";
 
 export default function DebatePage() {
   const { topic, party, sessionId, rounds, setRound } = useDebateStore();
   const [input, setInput] = useState("");
   const currentRound = useMemo(() => rounds.find((r) => !r.judgeScore) ?? rounds[0], [rounds]);
   const [loading, setLoading] = useState(false);
+  const [openingLoading, setOpeningLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     // Fetch opening argument for the first round if missing
     const run = async () => {
       if (!sessionId || !topic || !party) return;
       if (!currentRound.aiOpening) {
+        setOpeningLoading(true);
         try {
           const res = await fetch("/api/ai/opening", {
             method: "POST",
@@ -21,8 +26,11 @@ export default function DebatePage() {
           });
           const data = await res.json();
           setRound(currentRound.index, { aiOpening: data.text ?? "" });
+          if (Array.isArray(data.suggestions)) setSuggestions(data.suggestions);
         } catch (e) {
           console.error(e);
+        } finally {
+          setOpeningLoading(false);
         }
       }
     };
@@ -72,10 +80,32 @@ export default function DebatePage() {
       </header>
 
       <main className="space-y-4">
+        {openingLoading && (
+          <div className="rounded-md border p-3 bg-gray-50 dark:bg-gray-900/40" aria-busy="true" aria-live="polite">
+            <div className="text-xs text-muted-foreground mb-1">Parti-Agent</div>
+            <p>Laster inn innledning…</p>
+          </div>
+        )}
         {currentRound.aiOpening && (
           <div className="rounded-md border p-3 bg-gray-50 dark:bg-gray-900/40" aria-live="polite">
             <div className="text-xs text-muted-foreground mb-1">Parti-Agent</div>
-            <p>{currentRound.aiOpening}</p>
+            <p className="mb-2">{currentRound.aiOpening}</p>
+            <div className="flex items-center justify-between">
+              <TTSButton text={currentRound.aiOpening} />
+            </div>
+            {suggestions.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {suggestions.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setInput(s)}
+                    className="px-2 py-1 rounded-full border text-xs hover:bg-black/5 dark:hover:bg-white/10"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -89,7 +119,8 @@ export default function DebatePage() {
         {currentRound.aiRebuttal && (
           <div className="rounded-md border p-3 bg-gray-50 dark:bg-gray-900/40">
             <div className="text-xs text-muted-foreground mb-1">Parti-Agent</div>
-            <p>{currentRound.aiRebuttal}</p>
+            <p className="mb-2">{currentRound.aiRebuttal}</p>
+            <TTSButton text={currentRound.aiRebuttal} />
           </div>
         )}
 
@@ -116,10 +147,12 @@ export default function DebatePage() {
             placeholder="Dine motargumenter…"
             className="flex-1 rounded-md border px-3 py-2 bg-transparent"
             aria-label="Ditt svar"
+            disabled={!currentRound.aiOpening || openingLoading}
           />
+          <MicButton onText={(t) => setInput((prev) => (prev ? prev + " " + t : t))} />
           <button
             type="submit"
-            disabled={loading || !input.trim()}
+            disabled={loading || !input.trim() || openingLoading}
             className="px-4 py-2 rounded-md bg-black text-white disabled:opacity-50 dark:bg-white dark:text-black"
           >
             Send
@@ -138,4 +171,3 @@ export default function DebatePage() {
     </div>
   );
 }
-
