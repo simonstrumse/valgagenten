@@ -9,7 +9,8 @@
     "lint": "eslint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
-    "ingest": "node scripts/ingest.mjs"
+    "ingest": "node scripts/ingest.mjs",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
