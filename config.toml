@@ -1,0 +1,19 @@
+[projects."/Users/simonsouyrisstrumse/Claude Code Projects/Valgagenten"]
+trust_level = "trusted"
+
+#SUPABASE-VIBELABS
+#[mcp_servers.supabase_rw]
+#command = "npx"
+#args = ["-y", "@supabase/mcp-server-supabase@latest", "--project-ref=kfeshladeozgdvmfiowh"]
+#env = { SUPABASE_ACCESS_TOKEN = "sbp_3fa62098832fab1518964b896a17d2bdd280ab0f" }
+
+#[mcp_servers.supabase]
+#command = "npx"
+#args = ["-y", "@supabase/mcp-server-supabase@latest", "--read-only", "--project-ref=kfeshladeozgdvmfiowh"]
+#env = { SUPABASE_ACCESS_TOKEN = "sbp_3fa62098832fab1518964b896a17d2bdd280ab0f" }
+
+#SUPABASE-VALGAGENTEN
+#[mcp_servers.supabase_rw]
+#command = "npx"
+#args = ["-y", "@supabase/mcp-server-supabase@latest", "--project-ref=ceuacklnqfkitemgjpcq"]
+#env = { SUPABASE_ACCESS_TOKEN = "sbp_3fa62098832fab1518964b896a17d2bdd280ab0f" }

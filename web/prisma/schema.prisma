@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  topic      String
+  party      String
+  rounds     Round[]
+  totalScore Int?
+  anonHandle String
+}
+
+model Round {
+  id         String   @id @default(cuid())
+  sessionId  String
+  index      Int
+  aiOpening  String
+  userReply  String
+  aiRebuttal String?
+  judgeScore Int?
+  judgeNotes String?
+  Session    Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, index])
+}
+
+model Leaderboard {
+  id         String   @id @default(cuid())
+  sessionId  String   @unique
+  totalScore Int
+  createdAt  DateTime @default(now())
+}
