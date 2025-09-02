@@ -1,7 +1,6 @@
 // Minimal ingest skeleton: fetch URLs, basic clean, segment, and write JSON.
 import fs from "node:fs/promises";
 import path from "node:path";
-import fetch from "node-fetch";
 
 const urls = [
   // TODO: legg til faktiske kilder per parti/tema
@@ -60,4 +59,3 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
-

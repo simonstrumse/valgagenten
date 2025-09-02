@@ -20,6 +20,12 @@ Neste milepæler:
 - RAG: hente 1–2 partier x 2–3 temaer
 - Enhetstester (judge-parser) og enkel e2e
 
+Utført (infra):
+- Opprettet GitHub-repo og pushet kode (simonstrumse/valgagenten)
+- Opprettet Vercel-prosjekt (web) og koblet til GitHub via CLI
+- Push’et Supabase envs (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY) til Vercel
+- Supabase: opprettet tabeller via MCP og aktivert RLS (uten policies)
+
 Status holdes også i Codex-planverktøyet og speiles her manuelt ved endringer.
 
 ---

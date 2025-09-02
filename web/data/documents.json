@@ -1,0 +1,51 @@
+[
+  {
+    "id": "H_klima_2021_1",
+    "content": "Høyre vil kutte utslipp gjennom teknologi og internasjonalt samarbeid, samtidig som vi ivaretar arbeidsplasser.",
+    "party": "H",
+    "topic": "klima",
+    "year": "2021",
+    "source_url": "https://hoyre.no/partiprogram"
+  },
+  {
+    "id": "H_skatt_2021_1",
+    "content": "Skattesystemet skal stimulere til arbeid og investeringer, med forutsigbare rammer og lavere skatt på arbeid.",
+    "party": "H",
+    "topic": "skatt",
+    "year": "2021",
+    "source_url": "https://hoyre.no/partiprogram"
+  },
+  {
+    "id": "SV_klima_2021_1",
+    "content": "SV vil kutte utslipp raskt med store investeringer i kollektiv, fornybar energi og grønn industri.",
+    "party": "SV",
+    "topic": "klima",
+    "year": "2021",
+    "source_url": "https://sv.no/partiprogram"
+  },
+  {
+    "id": "SV_skole_2021_1",
+    "content": "SV vil styrke fellesskolen med flere lærere, mindre testing og like muligheter for alle elever.",
+    "party": "SV",
+    "topic": "skole",
+    "year": "2021",
+    "source_url": "https://sv.no/partiprogram"
+  },
+  {
+    "id": "Ap_helse_2021_1",
+    "content": "Arbeiderpartiet vil styrke helsetjenestene nær folk, redusere ventetider og satse på forebygging.",
+    "party": "Ap",
+    "topic": "helse",
+    "year": "2021",
+    "source_url": "https://arbeiderpartiet.no/partiprogram"
+  },
+  {
+    "id": "MDG_miljo_2021_1",
+    "content": "MDG vil stanse naturtap, verne mer natur og prioritere klimahensyn i all politikk.",
+    "party": "MDG",
+    "topic": "miljø",
+    "year": "2021",
+    "source_url": "https://mdg.no/partiprogram"
+  }
+]
+

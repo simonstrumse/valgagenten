@@ -7,10 +7,22 @@ export function TTSButton({ text }: { text: string }) {
   const play = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/tts", { method: "POST", body: JSON.stringify({ text }) });
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
       if (!res.ok) throw new Error("TTS ikke tilgjengelig");
-      const { url } = await res.json();
-      const a = new Audio(url);
+      let a: HTMLAudioElement;
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("audio")) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        a = new Audio(url);
+      } else {
+        const { url } = await res.json();
+        a = new Audio(url);
+      }
       setAudio(a);
       a.play();
     } catch (e) {

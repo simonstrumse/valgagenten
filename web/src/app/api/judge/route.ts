@@ -1,17 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildJudgeMessages, parseJudgeResponse } from "@/lib/prompts";
+import { openai } from "@/lib/openai";
 
 export async function POST(req: NextRequest) {
-  const { userText, aiText } = await req.json();
-  if (!userText || !aiText) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-  // Simple deterministic mock scoring based on length
-  const len = Math.min(userText.length, 400);
-  const score = Math.max(1, Math.min(5, Math.round(len / 100)));
-  const rationale =
-    score >= 4
-      ? "Tydelig problematisering med relevante eksempler. Kunne vært støttet av flere kilder."
-      : score >= 3
-      ? "Noen relevante poenger, men kunne vært mer presis og kildebasert."
-      : "Begrenset relevans og struktur; utdyp med konkrete eksempler.";
+  const { userText, aiText, topic, party } = await req.json();
+  if (!userText || !aiText || !topic || !party) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  const messages = buildJudgeMessages({ userText, aiText, topic, party });
+  const ai = await openai.chat.completions.create({ model: "gpt-4o-mini", messages, max_tokens: 200, temperature: 0 });
+  const raw = ai.choices?.[0]?.message?.content ?? "";
+  const { score, rationale } = parseJudgeResponse(raw);
   return NextResponse.json({ score, rationale });
 }
-
