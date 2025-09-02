@@ -15,6 +15,8 @@ export default function Home() {
 
   const start = async () => {
     if (!topic || !party) return;
+    // Reset any persisted debate state to avoid stale openings reappearing
+    useDebateStore.getState().reset();
     setSelection(topic, party);
     setLoading(true);
     try {

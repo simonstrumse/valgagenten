@@ -26,7 +26,8 @@ export function buildPartyAgentMessages({ party, topic, context, userText, task,
     ? ""
     : "Hvis konteksten er tom: Ikke be om mer kontekst. Gi en kort og engasjerende, men forsiktig oppsummering av typiske posisjoner. Marker usikkerhet tydelig. Unngå konkrete tall eller sitater uten kilde.";
   const tone = `Tone: vennlig, nysgjerrig og tydelig. Inviter brukeren til dialog. Gjenta ikke samme poeng.`;
-  const sys = `${SECURITY_PROMPT}\n\n${partyAgentSystem(party, topic)}\n\n${tone}\n${extra}`;
+  const guard = `Aldri skriv: "Det ser ut til at du ikke har gitt meg noe kontekst" eller be brukeren dele kontekst. Svar alltid konstruktivt selv ved tom kontekst.`;
+  const sys = `${SECURITY_PROMPT}\n\n${partyAgentSystem(party, topic)}\n\n${tone}\n${guard}\n${extra}`;
   const messages: ChatCompletionMessageParam[] = [
     { role: "system", content: sys },
     { role: "user", content: `Kontekst (utdrag):\n${context || "(tom)"}` },
