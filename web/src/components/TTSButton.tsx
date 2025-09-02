@@ -4,6 +4,7 @@ import { useState } from "react";
 export function TTSButton({ text }: { text: string }) {
   const [loading, setLoading] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const [status, setStatus] = useState<string>("Klar");
   const play = async () => {
     setLoading(true);
     try {
@@ -24,7 +25,10 @@ export function TTSButton({ text }: { text: string }) {
         a = new Audio(url);
       }
       setAudio(a);
-      a.play();
+      a.onplay = () => setStatus("Spiller av");
+      a.onpause = () => setStatus("Stoppet");
+      a.onended = () => setStatus("Ferdig");
+      await a.play();
     } catch (e) {
       console.error(e);
     } finally {
@@ -38,11 +42,12 @@ export function TTSButton({ text }: { text: string }) {
     }
   };
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 items-center">
       <button onClick={play} disabled={loading} className="px-2 py-1 rounded border text-sm">
         {loading ? "Laster…" : "Les opp"}
       </button>
       <button onClick={stop} className="px-2 py-1 rounded border text-sm">Stopp</button>
+      <span aria-live="polite" className="text-xs text-muted-foreground">{status}</span>
     </div>
   );
 }
