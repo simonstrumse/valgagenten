@@ -49,10 +49,14 @@ export async function POST(req: NextRequest) {
     temperature: 0.5,
   });
   const text = ai.choices?.[0]?.message?.content ?? "";
-  const suggestions = topicSuggestions[topic as string] || [
+  const base = topicSuggestions[topic as string] || [
     "Kan du presisere hovedmålet i politikken?",
     "Hvilke tiltak prioriteres først?",
     "Hva er kompromisser dere er åpne for?",
+  ];
+  const suggestions = [
+    ...base,
+    `Fortell kort hva som er viktig for deg i ${topic} (1 setning)`,
   ];
   return NextResponse.json({ text, citations, suggestions });
 }

@@ -25,7 +25,8 @@ export function buildPartyAgentMessages({ party, topic, context, userText, task,
   const extra = context && context.trim().length > 0
     ? ""
     : "Hvis konteksten er tom: Ikke be om mer kontekst. Gi en kort og engasjerende, men forsiktig oppsummering av typiske posisjoner. Marker usikkerhet tydelig. Unngå konkrete tall eller sitater uten kilde.";
-  const sys = `${SECURITY_PROMPT}\n\n${partyAgentSystem(party, topic)}\n\n${extra}`;
+  const tone = `Tone: vennlig, nysgjerrig og tydelig. Inviter brukeren til dialog. Gjenta ikke samme poeng.`;
+  const sys = `${SECURITY_PROMPT}\n\n${partyAgentSystem(party, topic)}\n\n${tone}\n${extra}`;
   const messages: ChatCompletionMessageParam[] = [
     { role: "system", content: sys },
     { role: "user", content: `Kontekst (utdrag):\n${context || "(tom)"}` },
@@ -35,10 +36,11 @@ export function buildPartyAgentMessages({ party, topic, context, userText, task,
     messages.push({
       role: "user",
       content:
-        `Oppgave: Skriv en engasjerende innledning (120–160 ord) som inviterer til dialog. \n` +
+        `Oppgave: Skriv en engasjerende innledning (120–160 ord) som inviterer til dialog.\n` +
         `- Ikke be om mer kontekst.\n` +
         `- Hvis konteksten var tom, lever en forsiktig, typisk oppsummering med tydelig usikkerhet.\n` +
         `- Avslutt med en vennlig setning ala: "Spør meg om ${party} og ${topic} – for eksempel:" og list opp 2–3 forslag nedenfor.\n` +
+        `- Legg til en invitasjon: "Fortell gjerne kort hva som er viktig for deg i ${topic}, så kan jeg forklare hvordan ${party} ser på det."\n` +
         `Forslag:\n${sugg}`,
     });
   }
