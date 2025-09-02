@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   if (!topic || !party) return NextResponse.json({ error: "Missing topic/party" }, { status: 400 });
 
   const { context, citations } = await ragSearch({ party, topic, k: 6 });
-  const messages = buildPartyAgentMessages({ party, topic, context });
+  const messages = buildPartyAgentMessages({ party, topic, context, task: "opening", suggestions: topicSuggestions[topic as string] });
   const ai = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages,

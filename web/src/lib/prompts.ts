@@ -9,7 +9,7 @@ Bruk KUN vedlagt kontekst fra partiprogrammer/nettsider når du hevder konkrete 
 Siter kort slik: [KILDE: Parti, År].
 Hold deg til 120–160 ord per tur. Ikke gjenta deg selv. Vær saklig.
 Når brukeren fremmer motargumenter, adresser dem punktvis (maks 3 poeng).
-Hvis konteksten er uklar: si hva som er uklart og hva som vanligvis menes.
+Viktig: Ikke be om mer kontekst fra brukeren. Hvis konteksten er uklar ELLER tom, gi en kort, forsiktig og typisk oppsummering av temaet med tydelig usikkerhetsmarkør, uten konkrete tall som ikke er i konteksten.
 Unngå direkte valgoppfordringer. Målet er treningsdebatt, ikke overtalelse.`;
 
 export const judgeSystem = `Du er en upartisk evaluator. Vurder brukerens motargument mot AI-innlegget i runden.
@@ -21,15 +21,27 @@ Format:
 SCORE: <heltall>
 BEGRUNNELSE: <maks 80 ord>`;
 
-export function buildPartyAgentMessages({ party, topic, context, userText }: { party: string; topic: string; context: string; userText?: string }): ChatCompletionMessageParam[] {
+export function buildPartyAgentMessages({ party, topic, context, userText, task, suggestions }: { party: string; topic: string; context: string; userText?: string; task?: "opening" | "rebuttal"; suggestions?: string[] }): ChatCompletionMessageParam[] {
   const extra = context && context.trim().length > 0
     ? ""
-    : "Hvis konteksten er tom: Gi en kort, forsiktig og generell oppsummering av typiske posisjoner i norsk politikk relatert til temaet, marker tydelig usikkerhet og unngå konkrete påstander eller tall. Ikke si at du mangler kontekst; lever et nyttig utgangspunkt med forbehold.";
+    : "Hvis konteksten er tom: Ikke be om mer kontekst. Gi en kort og engasjerende, men forsiktig oppsummering av typiske posisjoner. Marker usikkerhet tydelig. Unngå konkrete tall eller sitater uten kilde.";
   const sys = `${SECURITY_PROMPT}\n\n${partyAgentSystem(party, topic)}\n\n${extra}`;
   const messages: ChatCompletionMessageParam[] = [
     { role: "system", content: sys },
     { role: "user", content: `Kontekst (utdrag):\n${context || "(tom)"}` },
   ];
+  if (task === "opening") {
+    const sugg = suggestions && suggestions.length ? suggestions.map((s, i) => `${i + 1}. ${s}`).join("\n") : "1. Hva er hovedmålet?\n2. Hvilke tiltak prioriteres?\n3. Hvilke kompromisser er mulige?";
+    messages.push({
+      role: "user",
+      content:
+        `Oppgave: Skriv en engasjerende innledning (120–160 ord) som inviterer til dialog. \n` +
+        `- Ikke be om mer kontekst.\n` +
+        `- Hvis konteksten var tom, lever en forsiktig, typisk oppsummering med tydelig usikkerhet.\n` +
+        `- Avslutt med en vennlig setning ala: "Spør meg om ${party} og ${topic} – for eksempel:" og list opp 2–3 forslag nedenfor.\n` +
+        `Forslag:\n${sugg}`,
+    });
+  }
   if (userText) messages.push({ role: "user", content: `Brukerens siste innvendinger:\n${userText}` });
   return messages;
 }
