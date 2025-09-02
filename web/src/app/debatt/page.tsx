@@ -5,15 +5,15 @@ import { MicButton } from "@/components/MicButton";
 import { TTSButton } from "@/components/TTSButton";
 
 export default function DebatePage() {
-  const { topic, party, sessionId, rounds, setRound } = useDebateStore();
+  const { topic, party, sessionId, rounds, setRound, activeIndex, nextRound } = useDebateStore();
   const [input, setInput] = useState("");
-  const currentRound = useMemo(() => rounds.find((r) => !r.judgeScore) ?? rounds[0], [rounds]);
+  const currentRound = useMemo(() => rounds.find((r) => r.index === activeIndex) ?? rounds[0], [rounds, activeIndex]);
   const [loading, setLoading] = useState(false);
   const [openingLoading, setOpeningLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
-    // Fetch opening argument for the first round if missing
+    // Fetch opening argument for the active round if missing
     const run = async () => {
       if (!sessionId || !topic || !party) return;
       if (!currentRound.aiOpening) {
@@ -35,7 +35,7 @@ export default function DebatePage() {
       }
     };
     run();
-  }, [sessionId, topic, party, currentRound, setRound]);
+  }, [sessionId, topic, party, currentRound.index]);
 
   const submit = async () => {
     if (!input.trim() || !sessionId || !topic || !party) return;
@@ -166,6 +166,20 @@ export default function DebatePage() {
           >
             Se resultat
           </a>
+        </div>
+      )}
+
+      {!over && typeof currentRound.judgeScore === "number" && activeIndex < 3 && (
+        <div className="mt-4">
+          <button
+            onClick={() => {
+              setSuggestions([]);
+              nextRound();
+            }}
+            className="px-4 py-2 rounded-md border"
+          >
+            Neste runde
+          </button>
         </div>
       )}
     </div>
