@@ -159,20 +159,28 @@ function ChatInner() {
           <button type="button" onClick={seePreview} className="px-4 py-2 rounded-full border border-neutral-700">Se foreløpig samsvar</button>
         </div>
         <div className="flex gap-2 overflow-x-auto text-xs pb-1">
-          {["Klima og energi", "Skatt for småbedrifter", "Gaza / internasjonal politikk", "Skole og lærere", "Helse og fastlege"].map((t) => (
-            <button key={t} onClick={() => setInput(t)} className="px-2 py-1 rounded-full border border-neutral-700 hover:bg-white/5 whitespace-nowrap">{t}</button>
+          {[
+            { label: "Klima og energi", value: "Klima og energi" },
+            { label: "Skatt for småbedrifter", value: "Skatt for småbedrifter" },
+            { label: "Gaza / internasjonal politikk", value: "Gaza / internasjonal politikk" },
+            { label: "Skole og lærere", value: "Skole og lærere" },
+            { label: "Helse og fastlege", value: "Helse og fastlege" },
+            { label: "Del alder/lokasjon", value: "Jeg er 24 år i Oslo, student." },
+            {
+              label: "Småbedrift",
+              value: "Jeg jobber i en liten bedrift og er opptatt av rammevilkår.",
+            },
+          ].map((t) => (
+            <button
+              key={t.label}
+              onClick={() => setInput(t.value)}
+              className="px-2 py-1 rounded-full border border-neutral-700 hover:bg-white/5 whitespace-nowrap"
+            >
+              {t.label}
+            </button>
           ))}
         </div>
       </form>
-
-      {/* Quick chips */}
-      <div className="mt-16 flex flex-wrap gap-2 text-xs">
-        {["Klima og energi", "Skatt for småbedrifter", "Gaza / internasjonal politikk", "Skole og lærere", "Helse og fastlege"].map((t) => (
-          <button key={t} onClick={() => setInput(t)} className="px-2 py-1 rounded-full border border-neutral-700 hover:bg-white/5">{t}</button>
-        ))}
-        <button onClick={() => setInput("Jeg er 24 år i Oslo, student.")} className="px-2 py-1 rounded-full border border-neutral-700 hover:bg-white/5">Del alder/lokasjon</button>
-        <button onClick={() => setInput("Jeg jobber i en liten bedrift og er opptatt av rammevilkår.")} className="px-2 py-1 rounded-full border border-neutral-700 hover:bg-white/5">Småbedrift</button>
-      </div>
       {preview && (
         <div className="mt-6 rounded-2xl border border-neutral-800 p-3 bg-neutral-900/40">
           <div className="text-sm font-semibold mb-2">Foreløpig samsvar</div>
