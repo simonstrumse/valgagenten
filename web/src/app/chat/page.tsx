@@ -125,7 +125,11 @@ function ChatInner() {
           </div>
         </div>
       ) : null}
-      <div ref={listRef} className="space-y-3 flex-1 overflow-auto pb-40">
+      <div
+        ref={listRef}
+        className="space-y-3 flex-1 overflow-auto"
+        style={{ paddingBottom: "calc(10rem + env(safe-area-inset-bottom))" }}
+      >
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`${m.role === "user" ? "bg-blue-600 text-white" : "bg-neutral-800 text-neutral-100"} rounded-2xl px-4 py-2 max-w-[80%] whitespace-pre-wrap`}>{m.content}
@@ -142,7 +146,7 @@ function ChatInner() {
           e.preventDefault();
           send();
         }}
-        className="mt-4 flex flex-col gap-2 fixed left-0 right-0 bottom-0 max-w-3xl w-full mx-auto px-4 py-3 bg-gradient-to-t from-black/80 to-black/0"
+        className="mt-4 flex flex-col gap-2 fixed left-0 right-0 bottom-0 max-w-3xl w-full mx-auto px-4 py-3 bg-gradient-to-t from-black/80 to-black/0 pb-[env(safe-area-inset-bottom)]"
       >
         <input
           value={input}
