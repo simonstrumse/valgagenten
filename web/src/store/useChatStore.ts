@@ -12,6 +12,7 @@ interface ChatState {
   progress: number; // 0-100 heuristic
   setConversation: (id: string) => void;
   addMessage: (m: Msg) => void;
+  updateLastAssistant: (updater: (prev: string) => string) => void;
   setStreaming: (b: boolean) => void;
   setProfile: (p: Partial<ChatState["profile"]>) => void;
   setProgress: (n: number) => void;
@@ -26,6 +27,17 @@ export const useChatStore = create<ChatState>()(
       progress: 0,
       setConversation: (id) => set({ conversationId: id }),
       addMessage: (m) => set({ messages: [...get().messages, m] }),
+      updateLastAssistant: (updater) =>
+        set((s) => {
+          const msgs = [...s.messages];
+          for (let i = msgs.length - 1; i >= 0; i--) {
+            if (msgs[i].role === "assistant") {
+              msgs[i] = { ...msgs[i], content: updater(msgs[i].content) };
+              break;
+            }
+          }
+          return { messages: msgs };
+        }),
       setStreaming: (b) => set({ streaming: b }),
       setProfile: (p) => set({ profile: { ...get().profile, ...p } }),
       setProgress: (n) => set({ progress: Math.max(0, Math.min(100, Math.round(n))) }),
@@ -34,4 +46,3 @@ export const useChatStore = create<ChatState>()(
     { name: "valgagenten-chattomaten" }
   )
 );
-
