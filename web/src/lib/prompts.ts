@@ -50,6 +50,32 @@ Avvik: • …
 Kilder: [KILDE: Ap, 2023, URL], [KILDE: Ap, 2021, URL]
 Kort, nøytralt norsk.`;
 
+// Claim extraction (quantified preferences)
+export const CHATTOMATEN_CLAIMS = `Du skal trekke ut brukerens politiske preferanser som målbare påstander.
+Returner JSON:
+{ "claims": [ { "topic": string, "dimension": string, "value": string, "strength": number, "polarity": "for"|"imot"|"nøytral", "verbatim": string } ] }
+
+Regler:
+- Skille mellom selvbeskrivende utsagn (alder, bosted) og preferanser. Ikke ta med selvbeskrivende som claims.
+- Eksempler:
+  - "Avslutt krigen i Gaza nå": topic="utenriks/gaza", dimension="våpenhvile_nå", value="ja", strength≈0.9, polarity="for"
+  - "Støtte Palestina" → topic="utenriks/gaza", dimension="erkjennelse_palestina", value="ja"
+  - "Høyere CO2-avgifter" → topic="klima", dimension="co2_avgift_nivå", value="øke"
+  - "Stans leting" → topic="klima", dimension="oljeleting", value="stans"
+  - "Mer støtte til grønn industri" → topic="klima", dimension="industri_støtte", value="øke"
+Temaer: klima, skatt, skole, helse, innvandring, utenriks/gaza, energi.
+Vurder styrke 0..1 ut fra språk.
+`;
+
+// Party profile extraction (stance vectors per topic)
+export const CHATTOMATEN_PROFILE = `Du får korte utdrag fra et partiprogram (RAG). Oppgaven er å utlede partiets posisjon langs faste dimensjoner.
+Returner JSON:
+{ "topicProfiles": {
+  "klima": { "co2_avgift_nivå": "øke|beholde|senke|ukjent", "oljeleting": "stans|reduser|fortsett|ukjent", "industri_støtte": "øke|beholde|senke|ukjent", "kutt_tempo": "raskt|moderat|langsomt|ukjent" },
+  "utenriks/gaza": { "våpenhvile_nå": "ja|nei|ukjent", "erkjennelse_palestina": "ja|nei|ukjent", "sanksjoner_israel": "ja|nei|betinget|ukjent", "norges_rolle": "mekling|humanitær|ukjent" }
+}}
+Bruk kun informasjon som eksplisitt kan støttes i utdragene; ellers "ukjent".`;
+
 export function buildPartyAgentMessages({ party, topic, context, userText, task, suggestions }: { party: string; topic: string; context: string; userText?: string; task?: "opening" | "rebuttal"; suggestions?: string[] }): ChatCompletionMessageParam[] {
   const extra = context && context.trim().length > 0
     ? ""
