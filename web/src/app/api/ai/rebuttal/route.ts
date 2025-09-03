@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       text: "Jeg kan ikke svare på dette fordi innholdet bryter retningslinjene. Vennligst formuler argumentet saklig og uten hatefulle uttrykk.",
     });
   }
-  const { context } = await ragSearch({ party, topic, k: 6 });
+  const { context, citations } = await ragSearch({ party, topic, k: 6 });
   const messages = buildPartyAgentMessages({ party, topic, context, userText });
   const ai = await openai.chat.completions.create({
     model: "gpt-4o-mini",
@@ -22,5 +22,5 @@ export async function POST(req: NextRequest) {
     temperature: 0.6,
   });
   const text = ai.choices?.[0]?.message?.content ?? "";
-  return NextResponse.json({ text });
+  return NextResponse.json({ text, citations });
 }

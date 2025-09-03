@@ -10,7 +10,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
     "ingest": "node scripts/ingest.mjs",
-    "ingest:pg": "node scripts/ingest_pgvector.mjs ../../programmer",
+    "ingest:pg": "node ../ingest/ingest_pgvector.mjs ../programmer",
     "postinstall": "prisma generate"
   },
   "dependencies": {

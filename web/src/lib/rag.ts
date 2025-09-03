@@ -44,6 +44,7 @@ export async function ragSearch({ party, topic, k = 6 }: { party: string; topic:
         const { rows } = await client.query(
           `with scored as (
              select d.id, d.content, d.party, d.topic, d.year, d.source_url,
+               d.page, d.excerpt,
                (1 - (e.embedding <=> $1::vector)) as vec_score,
                ts_rank_cd(d.content_tsv, plainto_tsquery('norwegian', $2)) as lex_score,
                e.embedding::text as embtext
@@ -70,6 +71,8 @@ export async function ragSearch({ party, topic, k = 6 }: { party: string; topic:
           topic: r.topic,
           year: r.year,
           source_url: r.source_url,
+          page: r.page,
+          excerpt: r.excerpt,
           vec_score: Number(r.vec_score ?? 0),
           lex_score: Number(r.lex_score ?? 0),
           emb: parseEmb(r.embtext as string),
@@ -103,8 +106,8 @@ export async function ragSearch({ party, topic, k = 6 }: { party: string; topic:
         };
 
         const ranked = mmr(candidates, k);
-        const context = ranked.map((d) => `- ${d.content} [KILDE: ${d.party}${d.year ? ", " + d.year : ""}]`).join("\n");
-        return { context, citations: ranked.map((d) => ({ id: d.id, source_url: d.source_url })) };
+        const context = ranked.map((d) => `- ${d.content} [KILDE: ${d.party}${d.year ? ", " + d.year : ""}${d.page ? "; s. " + d.page : ""}]`).join("\n");
+        return { context, citations: ranked.map((d) => ({ id: d.id, source_url: d.source_url, party: d.party, year: d.year, page: d.page, excerpt: d.excerpt })) };
       } finally {
         client.release();
       }

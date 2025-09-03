@@ -25,7 +25,7 @@ export default function DebatePage() {
             body: JSON.stringify({ sessionId, topic, party, round: currentRound.index }),
           });
           const data = await res.json();
-          setRound(currentRound.index, { aiOpening: data.text ?? "" });
+          setRound(currentRound.index, { aiOpening: data.text ?? "", openingCitations: data.citations || [] });
           if (Array.isArray(data.suggestions)) setSuggestions(data.suggestions);
         } catch (e) {
           console.error(e);
@@ -50,7 +50,7 @@ export default function DebatePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, topic, party, round: currentRound.index, userText: input.trim() }),
       }).then((r) => r.json());
-      setRound(currentRound.index, { aiRebuttal: rebut.text ?? "" });
+      setRound(currentRound.index, { aiRebuttal: rebut.text ?? "", rebuttalCitations: rebut.citations || [] });
       // Judge
       const judge = await fetch("/api/judge", {
         method: "POST",
@@ -93,6 +93,23 @@ export default function DebatePage() {
             <div className="flex items-center justify-between">
               <TTSButton text={currentRound.aiOpening} />
             </div>
+            {currentRound.openingCitations?.length ? (
+              <ol className="mt-2 text-xs text-muted-foreground list-decimal list-inside">
+                {currentRound.openingCitations.map((c, i) => (
+                  <li key={`${c.id}-${i}`}>
+                    {[c.party, c.year ? ` ${c.year}` : ""].filter(Boolean).join(",")}
+                    {c.page ? ` – s. ${c.page}` : ""}
+                    {" "}
+                    {c.source_url ? (
+                      <a className="underline" href={c.source_url} target="_blank" rel="noreferrer">
+                        kilde
+                      </a>
+                    ) : null}
+                    {c.excerpt ? <span className="block opacity-80">“{c.excerpt.slice(0, 140)}{c.excerpt.length > 140 ? "…" : ""}”</span> : null}
+                  </li>
+                ))}
+              </ol>
+            ) : null}
             {suggestions.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {suggestions.map((s) => (
@@ -121,6 +138,23 @@ export default function DebatePage() {
             <div className="text-xs text-muted-foreground mb-1">Parti-Agent</div>
             <p className="mb-2">{currentRound.aiRebuttal}</p>
             <TTSButton text={currentRound.aiRebuttal} />
+            {currentRound.rebuttalCitations?.length ? (
+              <ol className="mt-2 text-xs text-muted-foreground list-decimal list-inside">
+                {currentRound.rebuttalCitations.map((c, i) => (
+                  <li key={`${c.id}-${i}`}>
+                    {[c.party, c.year ? ` ${c.year}` : ""].filter(Boolean).join(",")}
+                    {c.page ? ` – s. ${c.page}` : ""}
+                    {" "}
+                    {c.source_url ? (
+                      <a className="underline" href={c.source_url} target="_blank" rel="noreferrer">
+                        kilde
+                      </a>
+                    ) : null}
+                    {c.excerpt ? <span className="block opacity-80">“{c.excerpt.slice(0, 140)}{c.excerpt.length > 140 ? "…" : ""}”</span> : null}
+                  </li>
+                ))}
+              </ol>
+            ) : null}
           </div>
         )}
 

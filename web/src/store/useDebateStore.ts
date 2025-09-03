@@ -12,6 +12,8 @@ export interface RoundState {
   aiRebuttal?: string;
   judgeScore?: number;
   judgeNotes?: string;
+  openingCitations?: Array<{ id: string; source_url?: string; party?: string; year?: string; page?: number; excerpt?: string }>;
+  rebuttalCitations?: Array<{ id: string; source_url?: string; party?: string; year?: string; page?: number; excerpt?: string }>;
 }
 
 interface DebateState {

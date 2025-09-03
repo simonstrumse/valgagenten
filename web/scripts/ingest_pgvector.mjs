@@ -18,9 +18,27 @@ const pool = new Pool({ connectionString: connStr, ssl: { rejectUnauthorized: fa
 
 function guessParty(filename) {
   const f = filename.toLowerCase();
-  if (f.includes("hoyre") || f.includes("høyre") || f.includes("hoyres")) return "H";
-  if (f.includes("arbeidsprogram") || f.includes("arbeiderpartiet") || f.includes("ap")) return "Ap";
-  return "Ap"; // conservative default
+  const has = (...keys) => keys.some((k) => f.includes(k));
+  // Høyre
+  if (has("hoyre", "høyre", "hoyres", "høyres")) return "H";
+  // Arbeiderpartiet
+  if (has("arbeiderpartiet", " ap ", " ap-", " ap_", "ap.", "ap ")) return "Ap";
+  // Sosialistisk Venstreparti
+  if (has("sosialistisk venstreparti", "sv-", "sv_", " sv ", " sv.", "sv ", " sv")) return "SV";
+  // Miljøpartiet De Grønne
+  if (has("mdg", "miljøpartiet", "miljopartiet", "de grønne", "de gronne")) return "MDG";
+  // Fremskrittspartiet
+  if (has("fremskrittspartiet", "frp-", "frp_", " frp ", " frp.", "frp")) return "FrP";
+  // Senterpartiet
+  if (has("senterpartiet", " senterparti", "sp-", "sp_", " sp ", " sp.")) return "Sp";
+  // Rødt
+  if (has("rødt", "rodt", "rodts", " rødt ", " rødt.")) return "R";
+  // Venstre
+  if (has("venstre", " venstre-", " venstre_")) return "V";
+  // KrF
+  if (has("krf", "kristelig folkeparti", "kristelig-folkeparti", "kristeligfolkeparti")) return "KrF";
+  // No generic fallbacks that override other parties
+  return "Ap"; // conservative default if unknown
 }
 
 function guessTopic(text) {
