@@ -1,46 +1,50 @@
 "use client";
-import { useMemo } from "react";
-import Link from "next/link";
-import { useDebateStore } from "@/store/useDebateStore";
+import { useEffect, useState } from "react";
+import { useChatStore } from "@/store/useChatStore";
 
 export default function ResultPage() {
-  const { rounds, topic, party } = useDebateStore();
-  const total = useMemo(() => rounds.reduce((s, r) => s + (r.judgeScore ?? 0), 0), [rounds]);
-  const verdict = total >= 12 ? "sterk motargumentasjon" : total >= 9 ? "du holdt godt stand" : "parti-agenten overbeviste";
+  const { conversationId } = useChatStore();
+  const [res, setRes] = useState<any>(null);
+  useEffect(() => {
+    const run = async () => {
+      const r = await fetch(`/api/match/compute`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ conversationId }) }).then((r) => r.json());
+      setRes(r);
+    };
+    run();
+  }, [conversationId]);
 
   return (
-    <div className="min-h-screen px-6 py-8 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Resultat</h1>
-      <p className="mb-6">
-        Tema: <b>{topic}</b> · Parti: <b>{party}</b>
-      </p>
-      <div className="rounded-md border p-4 mb-6">
-        <div className="text-sm text-muted-foreground">Totalscore</div>
-        <div className="text-3xl font-bold">{total}/15</div>
-        <div className="mt-1">{verdict}</div>
-      </div>
-      <div className="space-y-3">
-        {rounds.map((r) => (
-          <div key={r.index} className="rounded-md border p-3">
-            <div className="font-semibold">Runde {r.index}</div>
-            <div className="text-sm">Score: {r.judgeScore ?? "–"}</div>
-            <div className="text-sm text-muted-foreground">{r.judgeNotes}</div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-8">
-        <label className="text-sm text-muted-foreground">Delbar tekst</label>
-        <textarea
-          className="w-full rounded-md border p-2 mt-1"
-          rows={3}
-          readOnly
-          value={`Debatt mot ${party} om ${topic} – score ${total}/15.\nBeste runde: ${rounds.find((r)=>r.judgeNotes)?.judgeNotes ?? ""}.\nTest Valgagenten: valgagenten.no`}
-        />
-      </div>
-      <div className="mt-6 flex gap-2">
-        <Link className="px-4 py-2 rounded-md border" href="/">Spill igjen</Link>
-        <Link className="px-4 py-2 rounded-md border" href="/toppliste">Se toppliste</Link>
-      </div>
+    <div className="min-h-screen max-w-3xl mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-4">Samsvar</h1>
+      {!res ? (
+        <div>Laster …</div>
+      ) : (
+        <div className="space-y-4">
+          {res.top?.map((p: any) => (
+            <div key={p.party} className="rounded-md border p-3">
+              <div className="font-semibold">{p.party} — {Math.round(p.score * 100)}/100</div>
+              <div className="text-sm mt-1">Hvorfor: {p.why?.join(" • ")}</div>
+              {p.disagree?.length ? <div className="text-sm mt-1">Avvik: {p.disagree.join(" • ")}</div> : null}
+              {p.citations?.length ? (
+                <ol className="mt-2 text-xs text-muted-foreground list-decimal list-inside">
+                  {p.citations.map((c: any, i: number) => (
+                    <li key={`${c.id}-${i}`}>
+                      {[c.party, c.year ? ` ${c.year}` : ""].filter(Boolean).join(",")} {c.page ? `– s. ${c.page}` : ""} {" "}
+                      {c.source_url ? (
+                        <a className="underline" href={c.source_url} target="_blank" rel="noreferrer">
+                          kilde
+                        </a>
+                      ) : null}
+                      {c.excerpt ? <span className="block opacity-80">“{c.excerpt.slice(0, 140)}{c.excerpt.length > 140 ? "…" : ""}”</span> : null}
+                    </li>
+                  ))}
+                </ol>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
+

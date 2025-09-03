@@ -43,3 +43,42 @@ model Leaderboard {
   totalScore Int
   createdAt  DateTime @default(now())
 }
+
+// Chattomaten models
+
+model Profile {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  age          Int?
+  municipality String?
+  occupation   String?
+  concerns     String?
+}
+
+model Conversation {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  profileId    String?
+  messages     Message[]
+  summary      String?
+  topicWeights Json?
+}
+
+model Message {
+  id             String        @id @default(cuid())
+  conversationId String
+  role           String
+  content        String
+  tokensIn       Int?
+  tokensOut      Int?
+  Conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model PartyMatch {
+  id             String   @id @default(cuid())
+  conversationId String   @unique
+  scores         Json
+  perTopic       Json
+  rationale      Json
+  createdAt      DateTime @default(now())
+}

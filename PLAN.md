@@ -26,6 +26,34 @@ Utført (infra):
 - Push’et Supabase envs (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY) til Vercel
 - Supabase: opprettet tabeller via MCP og aktivert RLS (uten policies)
 
+---
+
+## Chattomaten – PRD og byggeplan (på eksisterende infrastruktur)
+
+Mål: Samtalebasert valgomat som oppsummerer brukerens prioriteringer og matcher mot partienes programmer (RAG + cosine). Ingen stemmeråd.
+
+Hovedoppgaver:
+- Sider: /chat, /resultat, /metode
+- State: useChatStore (Zustand)
+- API: /api/chat/stream (stream), /api/match/preview, /api/match/compute, /api/feedback (senere)
+- Datamodell: Profile, Conversation, Message, PartyMatch
+- RAG: hybrid lexical+vector + MMR (gjenbruk), centroids per parti×tema on-the-fly
+- Prompts: Guide-agent, Matcher, Forklaringsskriver, Sikkerhet
+- UI: chat-bobler, chips, “grunnlag”-indikator, kilde-fotnoter
+
+Status:
+- Modeller og migrasjon lagt til (Profile, Conversation, Message, PartyMatch)
+- Streaming-chat /chat/stream implementert (Node runtime)
+- match/preview og match/compute implementert (forenklet) med cosine + vekter
+- UI-sider /chat, /resultat, /metode lagt til
+- Ingest flyttet til ingest/ og lagring til storage/ingested/ etter prosessering
+
+Neste:
+- Forbedre summarization/topicWeights fra samtale (LLM hver ~6 meldinger)
+- Bedre topic-annotering og caching av centroids
+- Integrere shadcn/ui-komponenter
+- QA-scenarier og snapshot-tester for match/compute
+
 Status holdes også i Codex-planverktøyet og speiles her manuelt ved endringer.
 
 ---
