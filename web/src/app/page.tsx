@@ -12,7 +12,7 @@ export default function Home() {
           <p className="text-sm text-muted-foreground">Tren på saklig debatt mot en parti-agent over 3 runder. Dommer gir poeng. TTS/STT støttet.</p>
           <div className="mt-3 inline-block px-3 py-1 rounded-md border text-sm">Åpne</div>
         </a>
-        <a href="/chat" className="block rounded-md border p-4 hover:bg-black/5 dark:hover:bg-white/10">
+        <a href="/chat?new=1" className="block rounded-md border p-4 hover:bg-black/5 dark:hover:bg-white/10">
           <div className="font-semibold mb-1">Chattomaten</div>
           <p className="text-sm text-muted-foreground">Samtalebasert valgomat: klargjør hva som er viktig for deg og se tematisk samsvar mot partier – med kilder.</p>
           <div className="mt-3 inline-block px-3 py-1 rounded-md border text-sm">Åpne</div>
