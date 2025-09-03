@@ -108,12 +108,38 @@ async function upsertChunk(client, d) {
   );
 }
 
-async function moveToStorage(absPath, party) {
-  const file = path.basename(absPath);
+function normalizeBaseName(name) {
+  const withoutExt = name.replace(/\.[^.]+$/i, "");
+  // Basic Norwegian mapping + diacritics removal
+  let s = withoutExt
+    .replace(/æ/gi, 'ae')
+    .replace(/å/gi, 'a')
+    .replace(/ø/gi, 'o')
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+  s = s.replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$|/g, '');
+  return s.slice(0, 80);
+}
+
+function buildNormalizedFilename(original, party, year) {
+  const base = normalizeBaseName(original);
+  const parts = [party || 'x', year || 'xxxx', base].filter(Boolean);
+  return parts.join('-') + '.pdf';
+}
+
+async function moveToStorage(absPath, party, year) {
+  const orig = path.basename(absPath);
   const yyyy = new Date().toISOString().slice(0, 10);
   const destDir = path.join(repoRoot, 'storage', 'ingested', yyyy, party);
   await fs.mkdir(destDir, { recursive: true });
-  const dest = path.join(destDir, file);
+  let filename = buildNormalizedFilename(orig, party, year);
+  let dest = path.join(destDir, filename);
+  let i = 1;
+  while (fscb.existsSync(dest)) {
+    const base = filename.replace(/\.pdf$/i, '');
+    dest = path.join(destDir, `${base}-${i}.pdf`);
+    i++;
+  }
   try {
     await fs.rename(absPath, dest);
   } catch (e) {
@@ -175,7 +201,7 @@ async function main() {
         }
       }
 
-      const dest = await moveToStorage(abs, party);
+      const dest = await moveToStorage(abs, party, year);
       console.log('  Flyttet til:', dest);
     }
   } finally {
@@ -188,4 +214,3 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
-
